@@ -54,27 +54,18 @@ namespace Fundo.Applications.WebApi
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FundoDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Enable Swagger in both Development AND Production
+            // Remove Swagger from the dev-only block and enable it always
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Loan API v1");
-                c.RoutePrefix = string.Empty; // Swagger at root
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fundo API V1");
+                c.RoutePrefix = "swagger"; // UI at /swagger
             });
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            dbContext.Database.Migrate();
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
-            app.UseCors("AllowAngular");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
