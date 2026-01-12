@@ -1,40 +1,50 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
+import { LoanService } from './services/loan.service';
+import { Loan } from './models/loan';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule],
+  selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  imports: [CommonModule, FormsModule],
 })
-export class AppComponent {
-  displayedColumns: string[] = [
-    'loanAmount',
-    'currentBalance',
-    'applicant',
-    'status',
-  ];
-  loans = [
-    {
-      loanAmount: 25000.00,
-      currentBalance: 18750.00,
-      applicant: 'John Doe',
-      status: 'active',
-    },
-    {
-      loanAmount: 15000.00,
-      currentBalance: 0,
-      applicant: 'Jane Smith',
-      status: 'paid',
-    },
-    {
-      loanAmount: 50000.00,
-      currentBalance: 32500.00,
-      applicant: 'Robert Johnson',
-      status: 'active',
-    },
-  ];
+export class AppComponent implements OnInit {
+  loans: Loan[] = [];
+  paying: Record<number, boolean> = {};
+  inputs: Record<number, number> = {};
+
+  constructor(private loanService: LoanService) {}
+
+  ngOnInit(): void {
+    this.loadLoans();
+  }
+
+  loadLoans(): void {
+    this.loanService.getAll().subscribe({
+      next: (data) => (this.loans = data),
+      error: (err) => console.error(err),
+    });
+  }
+
+  pay(loan: Loan): void {
+    const amount = this.inputs[loan.id];
+    if (!amount || amount <= 0) return;
+
+    this.paying[loan.id] = true;
+    this.loanService.makePayment(loan.id, amount).subscribe({
+      next: (updated) => {
+        const i = this.loans.findIndex((l) => l.id === loan.id);
+        if (i >= 0) this.loans[i] = updated;
+        this.inputs[loan.id] = 0;
+        this.paying[loan.id] = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.paying[loan.id] = false;
+      },
+    });
+  }
 }

@@ -81,3 +81,73 @@ Develop a **lightweight Angular app** to interact with the backend
 ## **Additional Information**
 
 Candidates are encouraged to include a `README.md` file in their repository detailing their implementation approach, any challenges they faced, features they couldn't complete, and any improvements they would make given more time. Ideally, the implementation should be completed within **two days** of starting the test.
+
+# Loan Management System
+
+A .NET Core backend API with Angular frontend for managing loans.
+
+## Prerequisites
+- Docker Desktop
+- Node.js 18+
+- .NET 6 SDK (for local dev)
+
+## Quick Start (Docker)
+
+```bash
+docker compose up --build
+```
+
+- Frontend: http://localhost (or http://localhost:4200 for dev)
+- API: http://localhost:5000
+- Swagger: http://localhost:5000/swagger
+- Database: localhost:1433 (SQL Server)
+
+## Local Development
+
+### Backend
+```bash
+cd backend/src/Fundo.Applications.WebApi
+dotnet run
+# API: https://localhost:5001
+```
+
+### Frontend
+```bash
+cd frontend
+npx ng serve --open
+# App: http://localhost:4200
+```
+
+### Database Migrations
+```bash
+cd backend/src/Fundo.Infrastructure
+dotnet ef database update --startup-project ../Fundo.Applications.WebApi/Fundo.Applications.WebApi.csproj
+```
+
+## Testing
+
+### Backend
+```bash
+cd backend
+dotnet test
+```
+
+### Frontend
+```bash
+cd frontend
+npx ng test
+```
+
+## API Endpoints
+
+- `GET /api/loans` - List all loans
+- `GET /api/loans/{id}` - Get loan by ID
+- `POST /api/loans` - Create loan
+- `POST /api/loans/{id}/payment` - Make payment
+
+## Architecture
+
+- **Backend**: Clean Architecture (Domain, Infrastructure, Services, WebApi)
+- **Frontend**: Angular with services and components
+- **Database**: SQL Server with EF Core
+- **DevOps**: Docker Compose for local development

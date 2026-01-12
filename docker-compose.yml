@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Pass@word123
+    ports:
+      - "1433:1433"
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/src/Fundo.Applications.WebApi/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=FundoDb;User Id=sa;Password=Pass@word123;TrustServerCertificate=true;
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
